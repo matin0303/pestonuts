@@ -114,9 +114,6 @@ export default function Main() {
       avatar: '/images/users/user3.jpg'
     },
   ];
-
-
-
   return (
     <div className='relative text-white'>
       <div id='main' className='w-full flex max-sm:flex-col justify-center items-center '>
@@ -517,7 +514,7 @@ export default function Main() {
             ))}
 
             {/* Actual data */}
-            {!isLoading && data?.data.map((data, index) => (
+            {(!isLoading && data) && data?.data.map((data, index) => (
               <CarouselItem
                 key={index}
                 className="w-full max-w-55 mx-5 basis-1/5 max-sm:basis-1/1 max-md:basis-1/2 max-lg:basis-1/3 max-xl:basis-1/4"
@@ -684,7 +681,7 @@ export default function Main() {
             ))}
 
             {/* Actual data */}
-            {!isLoading && articlesData?.data.map((data, index) => (
+            {(!isLoading && articlesData) &&  articlesData?.data.map((data, index) => (
               <CarouselItem
                 dir='rtl'
                 key={index}
