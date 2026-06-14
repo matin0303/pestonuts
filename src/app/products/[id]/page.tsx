@@ -4,7 +4,9 @@ import AddToCardSidebar from '@/components/Products/AddToCardSidebar';
 import ProductGallery from '@/components/Products/ProductGallery';
 import { useProduct } from '@/hook/useProduct';
 import { PhoneCall, Plus, Scale, ScaleIcon, ShoppingBag, ShoppingBasket, ShoppingCart } from 'lucide-react';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
+
 
 import { FaCashRegister } from 'react-icons/fa';
 import { IoCash, IoCashOutline, IoClose, IoScaleOutline } from 'react-icons/io5';
