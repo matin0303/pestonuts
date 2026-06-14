@@ -13,21 +13,22 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     notFound();
   }
   
-  const sanitizedContent = DOMPurify.sanitize(article.content, {
-    ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'a', 'img', 
-      'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 
-      'blockquote', 'code', 'pre', 'span',
-      'table', 'thead', 'tbody', 'tr', 'th', 'td',
-    ],
-    ALLOWED_ATTR: [
-      'href', 'src', 'alt', 'target', 'rel', 
-      'class', 'id', 'width', 'height',
-      'colspan', 'rowspan',
-    ],
-    ALLOW_UNKNOWN_PROTOCOLS: false,
-    KEEP_CONTENT: true,
-  });
+  const sanitizedContent = article.content
+  //  DOMPurify.sanitize(article.content, {
+  //   ALLOWED_TAGS: [
+  //     'p', 'br', 'strong', 'em', 'a', 'img', 
+  //     'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 
+  //     'blockquote', 'code', 'pre', 'span',
+  //     'table', 'thead', 'tbody', 'tr', 'th', 'td',
+  //   ],
+  //   ALLOWED_ATTR: [
+  //     'href', 'src', 'alt', 'target', 'rel', 
+  //     'class', 'id', 'width', 'height',
+  //     'colspan', 'rowspan',
+  //   ],
+  //   ALLOW_UNKNOWN_PROTOCOLS: false,
+  //   KEEP_CONTENT: true,
+  // });
 
   const addHeadingsId = (html: string): string => {
     let counter = 0;

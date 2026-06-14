@@ -35,7 +35,7 @@ export default function page({ params }: { params: any }) {
           <ProductGallery images={images}/>
 
           <div className='w-full h-12 rounded-sm justify-center items-center bg-black'>
-            <button className='w-full h-full text-white font-[paeez] text-3xl shadow-md/30 flex justify-center items-center flex-row-reverse'>ثبت سفارش تلفنی <PhoneCall className='pl-2' /></button>
+            <Link href='tel:09010791929' className='w-full h-full text-white font-[paeez] text-3xl shadow-md/30 flex justify-center items-center flex-row-reverse'>ثبت سفارش تلفنی <PhoneCall className='pl-2' /></Link>
           </div>
         </div>
         <div className=' w-full min-h-140 h-full rounded-sm shadow-md p-10 max-md:p-3'>
