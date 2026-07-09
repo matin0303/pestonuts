@@ -2,12 +2,12 @@
 
 import { useEditor, EditorContent } from '@tiptap/react'
 import { MenuBar } from './MenuBar'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { extensions } from '@/components/Admin/Article/CreateArticle/Editor/EditorExtensions'
 import { useUploadFile } from '@/hook/useUpload'
 import { cleanHTML } from '@/lib/utils'
-import CodeMirror from '@uiw/react-codemirror'
+import CodeMirror, { ReactCodeMirrorRef } from '@uiw/react-codemirror'
 import { html } from '@codemirror/lang-html'
 import { oneDark } from '@codemirror/theme-one-dark'
 import prettier from 'prettier/standalone'
@@ -26,6 +26,8 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
   const [codeContent, setCodeContent] = useState('')
   const [showAltModal, setShowAltModal] = useState(false)
   const [altText, setAltText] = useState('')
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null)
+  const codeMirrorRef = useRef<ReactCodeMirrorRef>(null)
   const { mutate: upload, isPending: penddingUpload } = useUploadFile()
 
   useEffect(() => {
@@ -90,9 +92,19 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
     setActiveTab(tab)
   }
 
-  // باز کردن مودال دریافت alt
+  // باز کردن مودال دریافت alt و ذخیره موقعیت کرسر
   const openAltModal = () => {
     setAltText('')
+    
+    // ذخیره موقعیت کرسر در تب کد
+    if (activeTab === 'code' && codeMirrorRef.current?.view) {
+      const view = codeMirrorRef.current.view
+      const pos = view.state.selection.main.head
+      setCursorPosition(pos)
+    } else {
+      setCursorPosition(null)
+    }
+    
     setShowAltModal(true)
   }
 
@@ -100,6 +112,7 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
   const closeAltModal = () => {
     setShowAltModal(false)
     setAltText('')
+    setCursorPosition(null)
   }
 
   // وقتی alt وارد شد و کاربر روی دکمه ادامه کلیک کرد
@@ -131,7 +144,7 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
           return
         }
 
-        // آپلود تصویر با alt
+        // آپلود تصویر با alt و cursorPosition
         await uploadImage(file, altText)
       }
 
@@ -139,7 +152,7 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
     }, 100)
   }
 
-  // تابع آپلود تصویر با alt
+  // تابع آپلود تصویر با alt و قرار دادن در موقعیت کرسر
   const uploadImage = async (file: File, alt: string) => {
     setIsUploading(true)
     toast.loading('در حال آپلود عکس...', { id: 'upload' })
@@ -149,14 +162,40 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
         { file: file, folder: 'article' }, 
         { 
           onSuccess(response) {
-            // اضافه کردن تصویر با alt به ادیتور
-            editor?.chain()
-              .focus()
-              .setImage({ 
-                src: response.data.url,
-                alt: alt
+            const imageUrl = response.data.url
+            const imgTag = `<img src="${imageUrl}" alt="${alt}" />`
+
+            // اگر در تب کد هستیم و موقعیت کرسر داریم
+            if (activeTab === 'code' && cursorPosition !== null && codeMirrorRef.current?.view) {
+              const view = codeMirrorRef.current.view
+              
+              // اضافه کردن تگ img در موقعیت کرسر
+              view.dispatch({
+                changes: {
+                  from: cursorPosition,
+                  to: cursorPosition,
+                  insert: imgTag
+                }
               })
-              .run()
+              
+              // آپدیت محتوای ادیتور بصری
+              const newContent = view.state.doc.toString()
+              editor?.commands.setContent(newContent, { emitUpdate: false })
+              setCodeContent(newContent)
+              onChange?.(newContent)
+              
+              // آپدیت موقعیت کرسر به انتهای تگ اضافه شده
+              setCursorPosition(null)
+            } else {
+              // اگر در تب بصری هستیم، مثل قبل عمل کن
+              editor?.chain()
+                .focus()
+                .setImage({ 
+                  src: imageUrl,
+                  alt: alt
+                })
+                .run()
+            }
             
             toast.success('عکس با موفقیت آپلود شد', { id: 'upload' })
           },
@@ -169,6 +208,7 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
       toast.error('خطا در آپلود عکس', { id: 'upload' })
     } finally {
       setIsUploading(false)
+      setCursorPosition(null)
     }
   }
 
@@ -297,6 +337,7 @@ export function TipTapEditor({ content = '', onChange }: TipTapEditorProps) {
       ) : (
         <div className="min-h-[400px]">
           <CodeMirror
+            ref={codeMirrorRef}
             dir='ltr'
             value={codeContent}
             onChange={handleCodeChange}
