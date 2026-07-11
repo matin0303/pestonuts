@@ -14,7 +14,6 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   }
   
   const sanitizedContent = article.content
-  console.log(sanitizedContent)
   //  DOMPurify.sanitize(article.content, {
   //   ALLOWED_TAGS: [
   //     'p', 'br', 'strong', 'em', 'a', 'img', 
