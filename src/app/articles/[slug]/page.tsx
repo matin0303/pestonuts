@@ -6,14 +6,15 @@ import { Article } from '@/types/api.types';
 import ArticleCard from '@/components/ArticleCard/ArticleCard';
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  
-  const response = await getArticle(params.slug);
+  const { slug } = await params;
+  const response = await getArticle(slug);
   const article:Article = response?.data?.article;
   if (!article?.content) {
     notFound();
   }
   
   const sanitizedContent = article.content
+  console.log(sanitizedContent)
   //  DOMPurify.sanitize(article.content, {
   //   ALLOWED_TAGS: [
   //     'p', 'br', 'strong', 'em', 'a', 'img', 
@@ -103,27 +104,28 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
 async function getArticle(slug: string) {
   try {
-    
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL }/articles/${slug}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/articles/${slug}`, {
       // next: { revalidate: 3600 },
       headers: {
         'Content-Type': 'application/json',
       },
     });
+    
     if (!res.ok) {
       if (res.status === 404) return null;
       throw new Error(`HTTP error! status: ${res.status}`);
     }
 
-    return await res.json();
+    const data = await res.json(); 
+    return data;
   } catch (error) {
     console.error('Error fetching article:', error);
     return null;
   }
 }
-
 export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const response = await getArticle(params.slug);
+  const { slug } = await params;
+  const response = await getArticle(slug);
   const article = response?.data?.article;
   return {
     title: article?.title || 'مقاله یافت نشد',
