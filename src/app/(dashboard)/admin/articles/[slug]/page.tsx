@@ -10,6 +10,7 @@ export default function page({ params }: { params: any }) {
     const { data } = useArticleBySlug(slug);
 
     useEffect(() => {
+        console.log(data)
         if (!data) return
         setInitialData(data?.data.article)
     }, [data])
