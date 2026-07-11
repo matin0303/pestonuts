@@ -18,10 +18,10 @@ export default function page({ params }: { params: any }) {
         <div className='w-full flex justify-center items-center py-20'>
             {data && initialData &&
                 <div className='relative z-20'>
-                    <ArticleForm
+                    {/* <ArticleForm
                         isEditing={true}
                         initialData={initialData}
-                    />
+                    /> */}
                 </div>
             }
         </div>
